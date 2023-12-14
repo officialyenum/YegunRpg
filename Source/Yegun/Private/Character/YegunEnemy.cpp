@@ -13,6 +13,7 @@ AYegunEnemy::AYegunEnemy()
 
 	AbilitySystemComponent = CreateDefaultSubobject<UYegunAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	
 	AttributeSet = CreateDefaultSubobject<UYegunAttributeSet>("AttributeSet");
 }
@@ -30,4 +31,11 @@ void AYegunEnemy::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	// bHighlighted = false;
+}
+
+void AYegunEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }

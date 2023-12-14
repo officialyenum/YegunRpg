@@ -12,6 +12,7 @@ AYegunPlayerState::AYegunPlayerState()
 
 	AbilitySystemComponent = CreateDefaultSubobject<UYegunAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	
 	AttributeSet = CreateDefaultSubobject<UYegunAttributeSet>("AttributeSet");
 	NetUpdateFrequency = 100.f;

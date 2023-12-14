@@ -15,5 +15,9 @@ class YEGUN_API AYegunCharacter : public AYegunCharacterBase
 	GENERATED_BODY()
 public:
 	AYegunCharacter();
-	
+	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void OnRep_PlayerState() override;
+private:
+	void InitAbilityActorInfo();
 };
