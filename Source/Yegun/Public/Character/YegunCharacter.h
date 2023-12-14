@@ -13,5 +13,7 @@ UCLASS()
 class YEGUN_API AYegunCharacter : public AYegunCharacterBase
 {
 	GENERATED_BODY()
+public:
+	AYegunCharacter();
 	
 };

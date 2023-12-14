@@ -3,14 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InputActionValue.h"
 #include "GameFramework/PlayerController.h"
 #include "YegunPlayerController.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
 
-struct FInputValue;
+struct FInputActionValue;
 /**
  * 
  */
