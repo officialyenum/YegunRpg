@@ -18,4 +18,7 @@ class YEGUN_API AYegunEnemy : public AYegunCharacterBase, public IEnemyInterface
 public:
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
+	
+	UPROPERTY(BlueprintReadOnly)
+	bool bHighlighted = false;
 };

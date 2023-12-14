@@ -5,8 +5,10 @@
 
 void AYegunEnemy::HighlightActor()
 {
+	bHighlighted = true;
 }
 
 void AYegunEnemy::UnHighlightActor()
 {
+	bHighlighted = false;
 }
