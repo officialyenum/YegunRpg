@@ -3,12 +3,19 @@
 
 #include "Character/YegunEnemy.h"
 
+#include "Yegun/Yegun.h"
+
 void AYegunEnemy::HighlightActor()
 {
-	bHighlighted = true;
+	GetMesh()->SetRenderCustomDepth(true);
+	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_PASS);
+	Weapon->SetRenderCustomDepth(true);
+	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_PASS);
+	// bHighlighted = true;
 }
 
 void AYegunEnemy::UnHighlightActor()
 {
-	bHighlighted = false;
+	GetMesh()->SetRenderCustomDepth(false);
+	// bHighlighted = false;
 }
