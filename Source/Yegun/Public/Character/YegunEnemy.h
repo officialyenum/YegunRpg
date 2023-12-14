@@ -16,6 +16,9 @@ class YEGUN_API AYegunEnemy : public AYegunCharacterBase, public IEnemyInterface
 	GENERATED_BODY()
 
 public:
+	AYegunEnemy();
+
+	
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
 	

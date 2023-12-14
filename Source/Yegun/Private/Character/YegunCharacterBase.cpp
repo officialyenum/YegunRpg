@@ -13,6 +13,11 @@ AYegunCharacterBase::AYegunCharacterBase()
 
 }
 
+UAbilitySystemComponent* AYegunCharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
 void AYegunCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

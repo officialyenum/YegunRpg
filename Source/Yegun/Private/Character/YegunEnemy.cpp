@@ -3,7 +3,19 @@
 
 #include "Character/YegunEnemy.h"
 
+#include "AbilitySystem/YegunAbilitySystemComponent.h"
+#include "AbilitySystem/YegunAttributeSet.h"
 #include "Yegun/Yegun.h"
+
+AYegunEnemy::AYegunEnemy()
+{
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+
+	AbilitySystemComponent = CreateDefaultSubobject<UYegunAbilitySystemComponent>("AbilitySystemComponent");
+	AbilitySystemComponent->SetIsReplicated(true);
+	
+	AttributeSet = CreateDefaultSubobject<UYegunAttributeSet>("AttributeSet");
+}
 
 void AYegunEnemy::HighlightActor()
 {
