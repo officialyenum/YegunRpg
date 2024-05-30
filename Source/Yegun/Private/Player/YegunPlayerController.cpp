@@ -25,7 +25,10 @@ void AYegunPlayerController::BeginPlay()
 	check(YegunContext);
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	check(Subsystem);
-	Subsystem->AddMappingContext(YegunContext, 0);
+	if(Subsystem)
+	{
+		Subsystem->AddMappingContext(YegunContext, 0);
+	}
 
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;

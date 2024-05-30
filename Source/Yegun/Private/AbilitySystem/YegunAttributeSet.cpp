@@ -7,9 +7,9 @@
 
 UYegunAttributeSet::UYegunAttributeSet()
 {
-	InitHealth(100.f);
+	InitHealth(50.f);
 	InitMaxHealth(100.0f);
-	InitMana(100.f);
+	InitMana(80.f);
 	InitMaxMana(100.f);
 }
 

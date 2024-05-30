@@ -5,7 +5,9 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/YegunPlayerController.h"
 #include "Player/YegunPlayerState.h"
+#include "UI/HUD/YegunHUD.h"
 
 AYegunCharacter::AYegunCharacter()
 {
@@ -41,4 +43,13 @@ void AYegunCharacter::InitAbilityActorInfo()
 	YegunPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(YegunPlayerState, this);
 	AbilitySystemComponent = YegunPlayerState->GetAbilitySystemComponent();
 	AttributeSet = YegunPlayerState->GetAttributeSet();
+
+	if(AYegunPlayerController* YegunPlayerController = Cast<AYegunPlayerController>(GetController()))
+	{
+		if(AYegunHUD* YegunHUD = Cast<AYegunHUD>(YegunPlayerController->GetHUD()))
+		{
+			YegunHUD->InitOverlay(YegunPlayerController,YegunPlayerState,AbilitySystemComponent,AttributeSet);
+		}
+	}
+	
 }

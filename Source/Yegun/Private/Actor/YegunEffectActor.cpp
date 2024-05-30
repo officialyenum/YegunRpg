@@ -27,6 +27,7 @@ void AYegunEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 		//TODO: Change this later
 		UYegunAttributeSet* MutableYegunAttributeSet = const_cast<UYegunAttributeSet*>(YegunAttributeSet);
 		MutableYegunAttributeSet->SetHealth(YegunAttributeSet->GetHealth() + 25.0f);
+		MutableYegunAttributeSet->SetMana(YegunAttributeSet->GetMana() - 45.0f);
 		Destroy();
 	}
 	
