@@ -24,7 +24,7 @@ void AYegunPlayerController::BeginPlay()
 	Super::BeginPlay();
 	check(YegunContext);
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem);
+	//check(Subsystem);
 	if(Subsystem)
 	{
 		Subsystem->AddMappingContext(YegunContext, 0);
