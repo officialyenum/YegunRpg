@@ -24,3 +24,7 @@ void AYegunCharacterBase::BeginPlay()
 	
 }
 
+void AYegunCharacterBase::InitAbilityActorInfo()
+{
+}
+

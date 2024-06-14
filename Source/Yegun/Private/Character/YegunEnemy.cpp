@@ -36,6 +36,13 @@ void AYegunEnemy::UnHighlightActor()
 void AYegunEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	InitAbilityActorInfo();
 
+}
+
+void AYegunEnemy::InitAbilityActorInfo()
+{
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	Cast<UYegunAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
+	
 }

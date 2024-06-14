@@ -4,6 +4,7 @@
 #include "Character/YegunCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/YegunAbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/YegunPlayerController.h"
 #include "Player/YegunPlayerState.h"
@@ -41,6 +42,7 @@ void AYegunCharacter::InitAbilityActorInfo()
 	AYegunPlayerState* YegunPlayerState =GetPlayerState<AYegunPlayerState>();
 	check(YegunPlayerState);
 	YegunPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(YegunPlayerState, this);
+	Cast<UYegunAbilitySystemComponent>(YegunPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	AbilitySystemComponent = YegunPlayerState->GetAbilitySystemComponent();
 	AttributeSet = YegunPlayerState->GetAttributeSet();
 
