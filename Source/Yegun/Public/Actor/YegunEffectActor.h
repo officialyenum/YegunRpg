@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffect.h"
-#include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
 #include "YegunEffectActor.generated.h"
+
+class UAbilitySystemComponent;
 
 UENUM(BlueprintType)
 enum class EEffectApplicationPolicy
@@ -66,4 +67,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Applied Effects")
 	EEffectRemovalPolicy InfiniteEffectRemovalPolicy = EEffectRemovalPolicy::RemoveOnEndOverlap;
+
+	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectHandles;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Applied Effects")
+	float ActorLevel = 1.f;
 };
