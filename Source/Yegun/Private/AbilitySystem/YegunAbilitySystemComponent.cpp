@@ -3,9 +3,18 @@
 
 #include "AbilitySystem/YegunAbilitySystemComponent.h"
 
+#include "YegunGameplayTags.h"
+
 void UYegunAbilitySystemComponent::AbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UYegunAbilitySystemComponent::EffectApplied);
+	const FYegunGameplayTags& GameplayTags = FYegunGameplayTags::Get();
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		10.f,
+		FColor::Orange,
+		FString::Printf(TEXT("Tag: %s"), *GameplayTags.Attributes_Secondary_Armor.ToString())
+		);
 }
 
 void UYegunAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* AbilitySystemComponent,
