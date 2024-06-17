@@ -33,6 +33,11 @@ void AYegunEnemy::UnHighlightActor()
 	// bHighlighted = false;
 }
 
+int32 AYegunEnemy::GetPlayerLevel()
+{
+	return Level;
+}
+
 void AYegunEnemy::BeginPlay()
 {
 	Super::BeginPlay();

@@ -37,6 +37,13 @@ void AYegunCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+int32 AYegunCharacter::GetPlayerLevel()
+{
+	AYegunPlayerState* YegunPlayerState =GetPlayerState<AYegunPlayerState>();
+	check(YegunPlayerState);
+	return YegunPlayerState->GetPlayerLevel();
+}
+
 void AYegunCharacter::InitAbilityActorInfo()
 {
 	AYegunPlayerState* YegunPlayerState =GetPlayerState<AYegunPlayerState>();
@@ -53,5 +60,6 @@ void AYegunCharacter::InitAbilityActorInfo()
 			YegunHUD->InitOverlay(YegunPlayerController,YegunPlayerState,AbilitySystemComponent,AttributeSet);
 		}
 	}
+	InitializeDefaultAttributes();
 	
 }

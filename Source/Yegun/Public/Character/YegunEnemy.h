@@ -18,12 +18,20 @@ class YEGUN_API AYegunEnemy : public AYegunCharacterBase, public IEnemyInterface
 public:
 	AYegunEnemy();
 
-	// Enemy Interface
+	/** Enemy Interface */
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
-	// End Enemy Interface
+	/** End Enemy Interface */
+
+	/** Combat Interface */
+	virtual int32 GetPlayerLevel() override;
+	/** End Combat Interface */
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
+	int32 Level = 1;
+	
 };

@@ -11,20 +11,34 @@
 
 UYegunAttributeSet::UYegunAttributeSet()
 {
-	InitHealth(20.f);
-	InitMaxHealth(100.0f);
-	InitMana(10.f);
-	InitMaxMana(100.f);
+	// InitHealth(80.f);
+	// InitMana(10.f);
 }
 
 void UYegunAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	
-	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	/** Primary */
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, Strength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, Intelligence, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, Resilience, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, Vigor, COND_None, REPNOTIFY_Always);
+
+	/** Secondary */
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, AmorPenetration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, BlockChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, CriticalHitChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, CriticalHitDamage, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, CriticalHitResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, HealthRegeneration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, ManaRegeneration, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
+	
+	/** Vital */
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UYegunAttributeSet, Mana, COND_None, REPNOTIFY_Always);
 }
 
 void UYegunAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -94,7 +108,9 @@ void UYegunAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 		// In this case, Health's base value must be non-negative.
 		UE_LOG(LogTemp, Warning, TEXT("Health From GetHealth(): %f"), GetHealth())
 		UE_LOG(LogTemp, Warning, TEXT("Magnitude: %f"), Data.EvaluatedData.Magnitude)
-		SetHealth(FMath::Max(GetHealth(), 0.0f));
+		GEngine->AddOnScreenDebugMessage(1,3.f,FColor::Red,FString::Printf(TEXT("Health From GetHealth(): %f"), GetHealth()));
+		GEngine->AddOnScreenDebugMessage(1,3.f,FColor::Red,FString::Printf(TEXT("Magnitude: %f"), Data.EvaluatedData.Magnitude));
+		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
 	}
 	// Check to see if this call affects our Health by using the Property Getter.
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
@@ -103,8 +119,70 @@ void UYegunAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 		// In this case, Health's base value must be non-negative.
 		UE_LOG(LogTemp, Warning, TEXT("Mana From GetMana(): %f"), GetMana())
 		UE_LOG(LogTemp, Warning, TEXT("Magnitude: %f"), Data.EvaluatedData.Magnitude)
-		SetMana(FMath::Max(GetMana(), 0.0f));
+		GEngine->AddOnScreenDebugMessage(1,3.f,FColor::Red,FString::Printf(TEXT("Mana From GetMana(): %f"), GetMana()));
+		GEngine->AddOnScreenDebugMessage(1,3.f,FColor::Red,FString::Printf(TEXT("Magnitude: %f"), Data.EvaluatedData.Magnitude));
+		SetMana(FMath::Clamp(GetMana(), 0.0f, GetMaxMana()));
 	}
+}
+
+void UYegunAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, Strength, OldStrength);
+}
+
+void UYegunAttributeSet::OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, Intelligence, OldIntelligence);
+}
+
+void UYegunAttributeSet::OnRep_Resilience(const FGameplayAttributeData& OldResilience) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, Resilience, OldResilience);
+}
+
+void UYegunAttributeSet::OnRep_Vigor(const FGameplayAttributeData& OldVigor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, Vigor, OldVigor);
+}
+
+void UYegunAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, Armor, OldArmor);
+}
+
+void UYegunAttributeSet::OnRep_AmorPenetration(const FGameplayAttributeData& OldAmorPenetration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, AmorPenetration, OldAmorPenetration);
+}
+
+void UYegunAttributeSet::OnRep_BlockChance(const FGameplayAttributeData& OldBlockChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, BlockChance, OldBlockChance);
+}
+
+void UYegunAttributeSet::OnRep_CriticalHitChance(const FGameplayAttributeData& OldCriticalHitChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, CriticalHitChance, OldCriticalHitChance);
+}
+
+void UYegunAttributeSet::OnRep_CriticalHitDamage(const FGameplayAttributeData& OldCriticalHitDamage) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, CriticalHitDamage, OldCriticalHitDamage);
+}
+
+void UYegunAttributeSet::OnRep_CriticalHitResistance(const FGameplayAttributeData& OldCriticalHitResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, CriticalHitResistance, OldCriticalHitResistance);
+}
+
+void UYegunAttributeSet::OnRep_HealthRegeneration(const FGameplayAttributeData& OldHealthRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, HealthRegeneration, OldHealthRegeneration);
+}
+
+void UYegunAttributeSet::OnRep_ManaRegeneration(const FGameplayAttributeData& OldManaRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UYegunAttributeSet, ManaRegeneration, OldManaRegeneration);
 }
 
 void UYegunAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const

@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/YegunAbilitySystemComponent.h"
 #include "AbilitySystem/YegunAttributeSet.h"
+#include "Net/UnrealNetwork.h"
 
 AYegunPlayerState::AYegunPlayerState()
 {
@@ -18,7 +19,18 @@ AYegunPlayerState::AYegunPlayerState()
 	NetUpdateFrequency = 100.f;
 }
 
+void AYegunPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AYegunPlayerState, Level)
+}
+
 UAbilitySystemComponent* AYegunPlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void AYegunPlayerState::OnRep_Level(int32 OldLevel)
+{
+	Level = OldLevel;
 }
