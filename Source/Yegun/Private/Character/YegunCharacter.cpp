@@ -28,6 +28,7 @@ void AYegunCharacter::PossessedBy(AController* NewController)
 
 	// Init Ability Actor Info for the server
 	InitAbilityActorInfo();
+	AddCharacterAbilities();
 }
 
 void AYegunCharacter::OnRep_PlayerState()

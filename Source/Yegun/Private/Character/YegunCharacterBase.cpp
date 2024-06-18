@@ -3,6 +3,7 @@
 
 #include "Character/YegunCharacterBase.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/YegunAbilitySystemComponent.h"
 
 AYegunCharacterBase::AYegunCharacterBase()
 {
@@ -45,6 +46,14 @@ void AYegunCharacterBase::InitializeDefaultAttributes() const
 	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
 	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
 	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
+}
+
+void AYegunCharacterBase::AddCharacterAbilities()
+{
+	UYegunAbilitySystemComponent* YegunASC = CastChecked<UYegunAbilitySystemComponent>(AbilitySystemComponent);
+	if (!HasAuthority()) return;
+	
+	YegunASC->AddCharacterAbilities(StartupAbilities);
 }
 
 
