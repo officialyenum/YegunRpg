@@ -26,6 +26,12 @@ void AYegunCharacterBase::BeginPlay()
 	
 }
 
+FVector AYegunCharacterBase::GetCombatSocketLocation()
+{
+	check(Weapon);
+	return Weapon->GetSocketLocation(WeaponTipSocketName);
+}
+
 void AYegunCharacterBase::InitAbilityActorInfo()
 {
 }
@@ -48,7 +54,7 @@ void AYegunCharacterBase::InitializeDefaultAttributes() const
 	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
 }
 
-void AYegunCharacterBase::AddCharacterAbilities()
+void AYegunCharacterBase::AddCharacterAbilities() const
 {
 	UYegunAbilitySystemComponent* YegunASC = CastChecked<UYegunAbilitySystemComponent>(AbilitySystemComponent);
 	if (!HasAuthority()) return;

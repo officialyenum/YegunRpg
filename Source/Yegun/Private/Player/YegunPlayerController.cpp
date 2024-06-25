@@ -2,22 +2,49 @@
 
 
 #include "Player/YegunPlayerController.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
-#include "EnhancedInputComponent.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
+#include "YegunGameplayTags.h"
+#include "AbilitySystem/YegunAbilitySystemComponent.h"
+#include "Components/SplineComponent.h"
+#include "Input/YegunInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 
 AYegunPlayerController::AYegunPlayerController()
 {
 	bReplicates = true;
+	Spline = CreateDefaultSubobject<USplineComponent>("Spline");
 	
 }
 
 void AYegunPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
-
 	CursorTrace();
+	AutoRun();
+	
 }
+
+void AYegunPlayerController::AutoRun()
+{
+	if(!bAutoRunning) return;
+	if (APawn* ControlledPawn = GetPawn())
+	{
+		const FVector LocationOnSpline = Spline->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+		const FVector Direction = Spline->FindDirectionClosestToWorldLocation(LocationOnSpline, ESplineCoordinateSpace::World);
+		ControlledPawn->AddMovementInput(Direction);
+
+		const float DistanceToDestination = (LocationOnSpline - CachedDestination).Length();
+		if (DistanceToDestination <= AutoRunAcceptanceRadius)
+		{
+			bAutoRunning = false;
+		}
+	}
+}
+
 
 void AYegunPlayerController::BeginPlay()
 {
@@ -43,9 +70,10 @@ void AYegunPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	UYegunInputComponent* YegunInputComponent = CastChecked<UYegunInputComponent>(InputComponent);
 
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AYegunPlayerController::Move);
+	YegunInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AYegunPlayerController::Move);
+	YegunInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
 void AYegunPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -67,59 +95,90 @@ void AYegunPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void AYegunPlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if(!CursorHit.bBlockingHit) return;
 
 	LastActor = ThisActor;
 	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
-
-	/**
-	 *
-	 * Line Trace from cursor.
-	 *
-	 * A. Last Actor && This Actor is null
-	 *		- Do Nothing
-	 * B. Last Actor is null but this Actor is Valid
-	 *		- Highlight This Actor
-	 * C. Last Actor is Valid but This Actor is Null
-	 *		- UnHighlight Last Actor
-	 * D. Last Actor is Valid and This Actor is Valid But LastActor != This Actor
-	 *		- UnHighlight Last Actor and Highlit This Actor
-	 * E. Last Actor is Valid and This Actor is Valid And LastActor == This Actor
-	 *		- Do Nothing
-	 ***/
-
-	if(LastActor == nullptr)
+	if (LastActor != ThisActor)
 	{
-		if (ThisActor != nullptr)
-		{
-			// CASE B
-			ThisActor->HighlightActor();
-		}else
-		{
-			// Case A Do Nothing
-		}
-	}else
+		if (LastActor) LastActor->UnHighlightActor();
+		if (ThisActor) ThisActor->HighlightActor();
+	}
+}
+
+void AYegunPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+	if (!InputTag.MatchesTag(FYegunGameplayTags::Get().InputTag_LMB))
 	{
-		if(ThisActor == nullptr)
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
+		return;
+	}
+
+	if (bTargeting)
+	{
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
+	}
+	else
+	{
+		FollowTime += GetWorld()->GetDeltaSeconds();
+		if(CursorHit.bBlockingHit) CachedDestination = CursorHit.ImpactPoint;
+
+		if(APawn* ControlledPawn = GetPawn())
 		{
-			// CASE C
-			LastActor->UnHighlightActor();
-		}
-		else // Both Actors are Valid
-		{
-			if (LastActor != ThisActor)
-			{
-				// CASE D
-				LastActor->UnHighlightActor();
-				ThisActor->HighlightActor();
-				
-			}
-			else
-			{
-				// CASE E DO NOTHING
-			}
+			const FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+			ControlledPawn->AddMovementInput(WorldDirection);
 		}
 	}
 }
+
+void AYegunPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	if (InputTag.MatchesTag(FYegunGameplayTags::Get().InputTag_LMB))
+	{
+		bTargeting = ThisActor ? true : false;
+		bAutoRunning = false;
+	}
+}
+
+void AYegunPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	if (!InputTag.MatchesTag(FYegunGameplayTags::Get().InputTag_LMB))
+	{
+		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
+		return;
+	}
+	if (bTargeting)
+	{
+		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
+	}
+	else
+	{
+		const APawn* ControlledPawn = GetPawn();
+		if (FollowTime <= ShortPressThreshold && ControlledPawn)
+		{
+			if(UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(),CachedDestination))
+			{
+				Spline->ClearSplinePoints();
+				for (const FVector& PointLoc : NavPath->PathPoints)
+				{
+					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
+				}
+				CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+				bAutoRunning = true;
+			}
+		}
+		FollowTime = 0.f;
+		bTargeting = false;
+	}
+}
+
+UYegunAbilitySystemComponent* AYegunPlayerController::GetASC()
+{
+	if (YegunAbilitySystemComponent == nullptr)
+	{
+		YegunAbilitySystemComponent = Cast<UYegunAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return YegunAbilitySystemComponent;
+}
+
