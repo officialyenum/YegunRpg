@@ -4,6 +4,7 @@
 #include "Character/YegunEnemy.h"
 
 #include "AbilitySystem/YegunAbilitySystemComponent.h"
+#include "AbilitySystem/YegunAbilitySystemLibrary.h"
 #include "AbilitySystem/YegunAttributeSet.h"
 #include "Yegun/Yegun.h"
 
@@ -74,4 +75,10 @@ void AYegunEnemy::InitAbilityActorInfo()
 	Cast<UYegunAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
 	InitializeDefaultAttributes();
+}
+
+void AYegunEnemy::InitializeDefaultAttributes() const
+{
+	UYegunAbilitySystemLibrary::InitializeDefaultAttributes(this
+		,CharacterClass,Level,AbilitySystemComponent);
 }
