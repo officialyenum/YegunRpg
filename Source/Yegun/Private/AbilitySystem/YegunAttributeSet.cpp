@@ -127,10 +127,10 @@ void UYegunAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 	{
 		// This Gameplay Effect is changing Health. Apply it, but restrict the value first.
 		// In this case, Health's base value must be non-negative.
-		UE_LOG(LogTemp, Warning, TEXT("Health From GetHealth(): %f"), GetHealth())
-		UE_LOG(LogTemp, Warning, TEXT("Magnitude: %f"), Data.EvaluatedData.Magnitude)
-		GEngine->AddOnScreenDebugMessage(1,3.f,FColor::Red,FString::Printf(TEXT("Health From GetHealth(): %f"), GetHealth()));
-		GEngine->AddOnScreenDebugMessage(1,3.f,FColor::Red,FString::Printf(TEXT("Magnitude: %f"), Data.EvaluatedData.Magnitude));
+		UE_LOG(LogTemp, Warning, TEXT("Changed Health on %s, New Health : %f"), *Props.TargetAvatarActor->GetName(), GetHealth())
+		//UE_LOG(LogTemp, Warning, TEXT("Magnitude: %f"), Data.EvaluatedData.Magnitude)
+		GEngine->AddOnScreenDebugMessage(1,3.f,FColor::Red,FString::Printf(TEXT("Changed Health on %s, New Health : %f"), *Props.TargetAvatarActor->GetName(), GetHealth()));
+		//GEngine->AddOnScreenDebugMessage(1,3.f,FColor::Red,FString::Printf(TEXT("Magnitude: %f"), Data.EvaluatedData.Magnitude));
 		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
 	}
 	// Check to see if this call affects our Health by using the Property Getter.

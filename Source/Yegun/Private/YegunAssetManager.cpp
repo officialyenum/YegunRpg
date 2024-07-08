@@ -3,6 +3,7 @@
 
 #include "YegunAssetManager.h"
 #include "YegunGameplayTags.h"
+#include "AbilitySystemGlobals.h"
 
 UYegunAssetManager& UYegunAssetManager::Get()
 {
@@ -16,4 +17,7 @@ void UYegunAssetManager::StartInitialLoading()
 	Super::StartInitialLoading();
 
 	FYegunGameplayTags::InitializeNativeGameplayTags();
+
+	//This is required to use target data
+	UAbilitySystemGlobals::Get().InitGlobalData();
 }

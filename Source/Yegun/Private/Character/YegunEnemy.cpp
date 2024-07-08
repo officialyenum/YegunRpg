@@ -16,6 +16,9 @@ AYegunEnemy::AYegunEnemy()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	
 	AttributeSet = CreateDefaultSubobject<UYegunAttributeSet>("AttributeSet");
+	
+	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
+	HealthBar->SetupAttachment(GetRootComponent());
 }
 
 void AYegunEnemy::HighlightActor()
@@ -25,6 +28,7 @@ void AYegunEnemy::HighlightActor()
 	Weapon->SetRenderCustomDepth(true);
 	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_PASS);
 	// bHighlighted = true;
+
 }
 
 void AYegunEnemy::UnHighlightActor()
@@ -43,11 +47,31 @@ void AYegunEnemy::BeginPlay()
 	Super::BeginPlay();
 	InitAbilityActorInfo();
 
+	if (UYegunUserWidget* YegunUserWidget = Cast<UYegunUserWidget>(HealthBar->GetUserWidgetObject()))
+	{
+		YegunUserWidget->SetWidgetController(this);
+	}
+	if (const UYegunAttributeSet* YegunAS = CastChecked<UYegunAttributeSet>(AttributeSet))
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(YegunAS->GetHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnHealthChanged.Broadcast(Data.NewValue);
+			});
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(YegunAS->GetMaxHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxHealthChanged.Broadcast(Data.NewValue);
+			});
+		OnHealthChanged.Broadcast(YegunAS->GetHealth());
+		OnMaxHealthChanged.Broadcast(YegunAS->GetMaxHealth());
+	}
 }
 
 void AYegunEnemy::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UYegunAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
-	
+
+	InitializeDefaultAttributes();
 }

@@ -3,6 +3,8 @@
 
 #include "AbilitySystem/Abilities/YegunProjectileSpell.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -14,7 +16,7 @@ void UYegunProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Han
 
 }
 
-void UYegunProjectileSpell::SpawnProjectile()
+void UYegunProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation)
 {
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	if (!bIsServer) return;
@@ -22,9 +24,12 @@ void UYegunProjectileSpell::SpawnProjectile()
 	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo()))
 	{
 		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
+		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+		Rotation.Pitch = 0.f;
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SocketLocation);
 		//TODO: Set Projectile Rotation
+		SpawnTransform.SetRotation(Rotation.Quaternion());
 		
 		AYegunProjectile* Projectile = GetWorld()->SpawnActorDeferred<AYegunProjectile>(
 			ProjectileClass,
@@ -35,7 +40,10 @@ void UYegunProjectileSpell::SpawnProjectile()
 			);
 		
 		//TODO: Give the projectile a Gameplay Effect Spec for Causing Damage
-		
+		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
+		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+
+		Projectile->DamageEffectSpecHandle = SpecHandle;
 		Projectile->FinishSpawning(SpawnTransform);
 	}
 }

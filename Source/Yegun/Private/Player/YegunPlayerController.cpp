@@ -73,6 +73,8 @@ void AYegunPlayerController::SetupInputComponent()
 	UYegunInputComponent* YegunInputComponent = CastChecked<UYegunInputComponent>(InputComponent);
 
 	YegunInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AYegunPlayerController::Move);
+	YegunInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AYegunPlayerController::ShiftPressed);
+	YegunInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AYegunPlayerController::ShiftReleased);
 	YegunInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
@@ -115,7 +117,7 @@ void AYegunPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 	}
@@ -148,11 +150,8 @@ void AYegunPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
 		return;
 	}
-	if (bTargeting)
-	{
-		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
-	}
-	else
+	if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
+	if (!bTargeting && !bShiftKeyDown)
 	{
 		const APawn* ControlledPawn = GetPawn();
 		if (FollowTime <= ShortPressThreshold && ControlledPawn)
