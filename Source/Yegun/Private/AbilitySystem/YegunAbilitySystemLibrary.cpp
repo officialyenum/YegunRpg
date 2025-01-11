@@ -71,3 +71,17 @@ void UYegunAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* Worl
 	const FGameplayEffectSpecHandle VitalAttributeSpecHandle = ASC->MakeOutgoingSpec(ClassInfo->VitalAttributes, Level, VitalAttributesContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributeSpecHandle.Data.Get());
 }
+
+void UYegunAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContext, UAbilitySystemComponent* ASC)
+{
+	AYegunGameModeBase* YegunGameMode = Cast<AYegunGameModeBase>(UGameplayStatics::GetGameMode(WorldContext));
+
+	if (YegunGameMode == nullptr) return;
+
+	UCharacterClassInfo* ClassInfo = YegunGameMode->CharacterClassInfo;
+	for (TSubclassOf<UGameplayAbility> AbilityClass : ClassInfo->CommonAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		ASC->GiveAbility(AbilitySpec);
+	}
+}

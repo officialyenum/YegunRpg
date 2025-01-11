@@ -3,9 +3,11 @@
 
 #include "Character/YegunEnemy.h"
 
+#include "YegunGameplayTags.h"
 #include "AbilitySystem/YegunAbilitySystemComponent.h"
 #include "AbilitySystem/YegunAbilitySystemLibrary.h"
 #include "AbilitySystem/YegunAttributeSet.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Yegun/Yegun.h"
 
 AYegunEnemy::AYegunEnemy()
@@ -43,11 +45,18 @@ int32 AYegunEnemy::GetPlayerLevel()
 	return Level;
 }
 
+void AYegunEnemy::Die()
+{
+	SetLifeSpan(LifeSpan);
+	Super::Die();
+}
+
+
 void AYegunEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	InitAbilityActorInfo();
-
+	UYegunAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 	if (UYegunUserWidget* YegunUserWidget = Cast<UYegunUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
 		YegunUserWidget->SetWidgetController(this);
@@ -66,7 +75,15 @@ void AYegunEnemy::BeginPlay()
 			});
 		OnHealthChanged.Broadcast(YegunAS->GetHealth());
 		OnMaxHealthChanged.Broadcast(YegunAS->GetMaxHealth());
+		AbilitySystemComponent->RegisterGameplayTagEvent(FYegunGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
+			this, &AYegunEnemy::HitReactTagChanged);
 	}
+}
+
+void AYegunEnemy::HitReactTagChanged(const FGameplayTag CallBackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
 }
 
 void AYegunEnemy::InitAbilityActorInfo()

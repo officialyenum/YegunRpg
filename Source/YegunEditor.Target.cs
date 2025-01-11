@@ -9,6 +9,7 @@ public class YegunEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
+		bOverrideBuildEnvironment = true;
 
 		ExtraModuleNames.AddRange( new string[] { "Yegun" } );
 	}

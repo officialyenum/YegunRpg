@@ -15,6 +15,6 @@ class YEGUN_API AYegunGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditDefaultsOnly, Category="Character Class Default")
+	UPROPERTY(EditDefaultsOnly, Category="Character Class Defaults")
 	TObjectPtr<UCharacterClassInfo> CharacterClassInfo;
 };

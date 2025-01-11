@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "GameplayEffectExtension.h"
 #include "YegunGameplayTags.h"
+#include "Interaction/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
 
 UYegunAttributeSet::UYegunAttributeSet()
@@ -143,6 +144,31 @@ void UYegunAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 		GEngine->AddOnScreenDebugMessage(1,3.f,FColor::Red,FString::Printf(TEXT("Mana From GetMana(): %f"), GetMana()));
 		GEngine->AddOnScreenDebugMessage(1,3.f,FColor::Red,FString::Printf(TEXT("Magnitude: %f"), Data.EvaluatedData.Magnitude));
 		SetMana(FMath::Clamp(GetMana(), 0.0f, GetMaxMana()));
+	}
+	if(Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		const float LocalIncomingDamage = GetIncomingDamage();
+		SetIncomingDamage(0.f);
+		if(LocalIncomingDamage > 0)
+		{
+			const float NewHealth = GetHealth() - LocalIncomingDamage;
+			SetHealth(FMath::Clamp(NewHealth, 0.F, GetMaxHealth()));
+			const bool bFatal = NewHealth <= 0.f;
+			if (bFatal)
+			{
+				if(ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
+				{
+					CombatInterface->Die();
+				}
+				
+			}
+			else
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FYegunGameplayTags::Get().Effects_HitReact);
+				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
+		}
 	}
 }
 

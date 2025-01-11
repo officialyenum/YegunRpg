@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Interaction/CombatInterface.h"
+#include "YegunGameplayTags.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 void UYegunProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -43,6 +44,10 @@ void UYegunProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocat
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
 
+		FYegunGameplayTags GameplayTags = FYegunGameplayTags::Get();
+		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+		GEngine->AddOnScreenDebugMessage(-1, 3.f,FColor::Black, FString::Printf(TEXT("FireBolt Damage: %f"), ScaledDamage));
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 		Projectile->FinishSpawning(SpawnTransform);
 	}
